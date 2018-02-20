@@ -10,7 +10,7 @@ var iconv = require('iconv-lite');
 var url = "https://item.rakuten.co.jp/auc-pourvous/";
 //var detailurl = "https://review.rakuten.co.jp/item/1/252883_10010830/1.1/";
 var id = 1727;
-var idMax = 1730;
+var idMax = 1728;
 
 var getComments = function recursiveComments(url, response, id) {
     return new Promise(function (resolve, reject) {
