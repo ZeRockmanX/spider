@@ -18,6 +18,8 @@
   "homepage": "https://github.com/ZeRockmanX/spider#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "iconv-lite": "^0.4.19"
+    "express": "^4.16.2",
+    "iconv-lite": "^0.4.19",
+    "mongodb": "^3.0.2"
   }
 }
