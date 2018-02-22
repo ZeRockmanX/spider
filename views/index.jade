@@ -1,0 +1,10 @@
+doctype html
+head
+title!= title
+body
+    div
+        a(class={active: currentUrl === '/execute'} href='/execute') Execute
+    div
+        a(class={active: currentUrl === '/information'} href='/information') Data Information
+    div
+        p!= message

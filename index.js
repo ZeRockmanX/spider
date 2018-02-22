@@ -9,13 +9,17 @@ var dbUrl = 'mongodb://localhost:27017';
 //npm install cheerio --save(类似jquery的选择器)
 var cheerio = require("cheerio");
 var https = require('https');
-var http = require('http');
-var fs = require('fs');
+
 //npm install iconv-lite --save(解决乱码)
 var iconv = require('iconv-lite');
 
+//npm install jade --save(模版引擎)
+app.set('views', './views')
+app.set('view engine', 'jade');
+
 var url = "https://item.rakuten.co.jp/auc-pourvous/";
 //var detailurl = "https://review.rakuten.co.jp/item/1/252883_10010830/1.1/";
+
 var id = 1727;
 var idMax = 1728;
 
@@ -58,7 +62,7 @@ var getComments = function recursiveComments(url, response, id) {
                             description: comment,
                             originData: $originData(originData).html()
                         };
-                        await insertMongo(insertData);
+                        insertMongo(insertData);
                     });
                 });
                 for (let insertMongoAction of insertMongoActions) {
@@ -121,7 +125,35 @@ var insertMongo = function insert(insertData) {
     });
 };
 
+var selectMongo = function select() {
+    return new Promise(function (resolve, reject) {
+        MongoClient.connect(dbUrl, function (err, db) {
+            if (err) {
+                throw err;
+            } else {
+                var dbo = db.db("spider_db");
+            }
+            dbo.collection("rakuten").find().toArray(function (err, result) { // 返回集合中所有数据
+                if (err) {
+                    throw err;
+                } else {
+                    console.log("select success");
+                    console.log(result);
+                    resolve (result);
+                }
+                db.close();
+            });
+
+        });
+
+    });
+};
+
 app.get('/', function (request, response) {
+    response.render('index', {title: 'Spider', message: ''});
+});
+
+app.get('/execute', function (request, response) {
     let waits = [];
     (async () => {
         for (let ivd = id; ivd <= idMax; ivd++) {
@@ -146,10 +178,25 @@ app.get('/', function (request, response) {
                 }
             }
         }
-        response.end('process success');
+        response.render('index', {title: 'Spider', message: 'Process success'});
+        response.end();
     })();
 });
 
-var server = app.listen(3000, function () {
-    console.log('Service start : localhost:3000');
+app.get('/information', function (request, response) {
+    selectMongo().then((information) =>{
+            console.log(information);
+            response.render('index', {title: 'Spider', message: JSON.stringify(information)});
+            response.end();
+    });
+    // (async = () => {
+    //     let information = await selectMongo();
+    //     console.log(information.then());
+    //     response.render('index', {title: 'Spider', message: information});
+    //     response.end();
+    // })();
+});
+
+var server = app.listen(8000, function () {
+    console.log('Service start : localhost:8000');
 });
