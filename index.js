@@ -135,15 +135,13 @@ var selectMongo = function select() {
             }
             dbo.collection("rakuten").find().toArray(function (err, result) { // 返回集合中所有数据
                 if (err) {
-                    throw err;
+                    reject(err);
                 } else {
                     console.log("select success");
-                    console.log(result);
-                    resolve (result);
+                    resolve(result);
                 }
                 db.close();
             });
-
         });
 
     });
@@ -183,18 +181,22 @@ app.get('/execute', function (request, response) {
     })();
 });
 
-app.get('/information', function (request, response) {
-    selectMongo().then((information) =>{
-            console.log(information);
-            response.render('index', {title: 'Spider', message: JSON.stringify(information)});
-            response.end();
-    });
-    // (async = () => {
-    //     let information = await selectMongo();
-    //     console.log(information.then());
-    //     response.render('index', {title: 'Spider', message: information});
-    //     response.end();
-    // })();
+// promise
+// app.get('/information', function (request, response) {
+//     selectMongo().then((information) => {
+//         response.render('index', {title: 'Spider', message: JSON.stringify(information)});
+//         response.end();
+//     });
+// });
+
+// async
+app.get('/information', async function (request, response) {
+    let obj = (await selectMongo());
+    // for (let i in obj) {
+    //     console.log(i);
+    // }
+    response.render('index', {title: 'Spider', message: obj});
+    response.end();
 });
 
 var server = app.listen(8000, function () {
