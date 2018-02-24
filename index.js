@@ -4,8 +4,8 @@ var app = express();
 
 //npm install mongodb --save(mongoDB)
 var MongoClient = require('mongodb').MongoClient;
-var dbUrl = 'mongodb://X0575:27017';
-//var dbUrl = 'mongodb://localhost:27017';
+//var dbUrl = 'mongodb://X0575:27017';
+var dbUrl = 'mongodb://localhost:27017';
 
 //npm install cheerio --save(类似jquery的选择器)
 var cheerio = require("cheerio");
