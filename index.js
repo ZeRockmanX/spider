@@ -2,26 +2,28 @@
 var express = require('express');
 var app = express();
 
-//npm install mongodb --save
+//npm install mongodb --save(mongoDB)
 var MongoClient = require('mongodb').MongoClient;
-var dbUrl = 'mongodb://localhost:27017';
+var dbUrl = 'mongodb://X0575:27017';
+//var dbUrl = 'mongodb://localhost:27017';
 
 //npm install cheerio --save(类似jquery的选择器)
 var cheerio = require("cheerio");
 var https = require('https');
 
-//npm install iconv-lite --save(解决乱码)
+//npm install iconv-lite --save(解决汉字乱码)
 var iconv = require('iconv-lite');
 
-//npm install jade --save(模版引擎)
-app.set('views', './views')
-app.set('view engine', 'jade');
+//npm install ejs --save(模版引擎)
+app.set('views', './views');
+app.engine('.html', require('ejs').__express);
+app.set('view engine', 'html');
 
 var url = "https://item.rakuten.co.jp/auc-pourvous/";
 //var detailurl = "https://review.rakuten.co.jp/item/1/252883_10010830/1.1/";
 
 var id = 1727;
-var idMax = 1728;
+var idMax = 1727;
 
 var getComments = function recursiveComments(url, response, id) {
     return new Promise(function (resolve, reject) {
@@ -40,20 +42,20 @@ var getComments = function recursiveComments(url, response, id) {
                         $ = cheerio.load($originData(originData).html());
                         // 评论日期
                         $(".revUserEntryDate").each(function (i, revUserEntryDate) {
-                            reviewDate += $(revUserEntryDate).html();
+                            reviewDate += $(revUserEntryDate).text();
                         });
                         // 五星等级
                         $(".revUserRvwerNum").each(function (i, revUserRvwerNum) {
-                            level += $(revUserRvwerNum).html();
+                            level += $(revUserRvwerNum).text();
                         });
                         // 标签参数
                         // 利用者サイズ: トップスXL 以上  商品の使いみち:イベント商品を使う人:自分用購入した回数:はじめて
                         $(".revRvwUserDisp").each(function (i, revRvwUserDisp) {
-                            label += $(revRvwUserDisp).html();
+                            label += $(revRvwUserDisp).text();
                         });
                         // 评论内容
                         $(".description").each(function (i, description) {
-                            comment += $(description).html();
+                            comment += $(description).text();
                         });
                         var insertData = {
                             reviewDate: reviewDate,
@@ -69,13 +71,12 @@ var getComments = function recursiveComments(url, response, id) {
                     await insertMongoAction();
                 }
             }
-            //查找是否有下一页入口, 有则递归调用本函数
+            // 查找是否有下一页入口, 有则递归调用本函数
             let actions = [];
             $("a").each(function (i, e) {
                 actions.push(async () => {
                     let reg = /^(次の15件)(.*)$/gi;
                     if (reg.test($(e).text())) {
-                        //console.log($(e).attr("href"));
                         await getComments($(e).attr("href"), response, id);
                     }
                 })
@@ -118,7 +119,6 @@ var insertMongo = function insert(insertData) {
             } else {
                 console.log("insert success");
             }
-
             db.close();
         });
 
@@ -155,9 +155,9 @@ app.get('/execute', function (request, response) {
     let waits = [];
     (async () => {
         for (let ivd = id; ivd <= idMax; ivd++) {
-            commentcsUrl = url + ivd + "/";
-            console.log(commentcsUrl);
-            let downloadData = await getDownload(commentcsUrl);
+            let itemUrl = url + ivd + "/";
+            console.log(itemUrl);
+            let downloadData = await getDownload(itemUrl);
             if (downloadData) {
                 $ = cheerio.load(downloadData);
 
@@ -192,9 +192,6 @@ app.get('/execute', function (request, response) {
 // async
 app.get('/information', async function (request, response) {
     let obj = (await selectMongo());
-    // for (let i in obj) {
-    //     console.log(i);
-    // }
     response.render('index', {title: 'Spider', message: obj});
     response.end();
 });
