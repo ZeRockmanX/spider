@@ -1,0 +1,27 @@
+{
+  "name": "spider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZeRockmanX/spider.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZeRockmanX/spider/issues"
+  },
+  "homepage": "https://github.com/ZeRockmanX/spider#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "iconv-lite": "^0.4.19",
+    "md5": "^2.2.1",
+    "mongodb": "^3.0.2"
+  }
+}
