@@ -2,7 +2,7 @@ let https = require('https');
 let iconv = require('iconv-lite');
 
 module.exports = {
-    getDownload: async function download(url) {
+    getDownload: function download(url) {
         return new Promise(function (resolve, reject) {
             https.get(url, function (res) {
                 let data = "";

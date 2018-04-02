@@ -33,15 +33,17 @@ app.get('/api', async function (request, response) {
             try {
                 let itemUrl = baseUrl + article_id + "/";
                 await apiFunc.collectById(itemUrl, article_id);
+                console.log("ok");
                 response.render('api', {title: 'Spider', message: '[{Result:1}]'});
-            } catch (err) {
-                console.log(err);
+            } catch (error) {
+                console.log("collectComments error:");
+                console.log(error);
                 response.render('api', {title: 'Spider', message: '[{Result:0}]'});
             }
             break;
         default:
     }
-    response.end('asv');
+    response.end();
 });
 
 app.get('/information', async function (request, response) {

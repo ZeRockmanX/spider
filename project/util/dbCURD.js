@@ -27,26 +27,28 @@ module.exports = {
         });
     },
 
-    collectinsertMongo: async function insert(insertData, article_id) {
-        MongoClient.connect(dbUrl, async function (err, db) {
-            if (err) {
-                throw err;
-            } else {
-                var dbo = db.db(dbName);
-            }
-            await dbo.collection(collectionPrefixion + article_id).insertOne(insertData, function (err, result) {
+    collectinsertMongo: function insert(insertData, article_id) {
+        return new Promise(function (resolve, reject) {
+            MongoClient.connect(dbUrl, async function (err, db) {
                 if (err) {
                     throw err;
                 } else {
-                    console.log("insert success");
+                    var dbo = db.db(dbName);
                 }
-                db.close();
+                await dbo.collection(collectionPrefixion + article_id).insertOne(insertData, function (err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log("insert success");
+                        resolve(result);
+                    }
+                    db.close();
+                });
             });
-
         });
     },
 
-    checkhash: async function select(hash, article_id) {
+    checkhash: function select(hash, article_id) {
         return new Promise(async function (resolve, reject) {
             MongoClient.connect(dbUrl, async function (err, db) {
                 if (err) {
@@ -56,7 +58,11 @@ module.exports = {
                 }
                 let whereStr = {"hash": hash};  // 查询条件
                 await dbo.collection(collectionPrefixion + article_id).find(whereStr).count(function (err, count) {
-                    resolve(count);
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(count);
+                    }
                 });
                 db.close();
             });
